@@ -14,7 +14,7 @@ def parse_args():
     parser.add_argument("--repeats", "-n", type=int, default=3, help="Number of repeats per measurement")
     parser.add_argument("--algorithms", "-a", nargs="*", default=["numpy", "blocked", "naive"],
                         choices=["numpy", "blocked", "naive"], help="Algorithms to benchmark")
-    parser.add_argument("--sparse", action="store_true", help="Also run sparse benchmarks")
+    parser.add_argument("--sparse", action="store_true", default=True, help="Also run sparse benchmarks")
     parser.add_argument("--sparse-size", type=int, default=1024, help="Size for sparse benchmarks (n used in sparse) ")
     parser.add_argument("--sparsity-levels", nargs="*", type=float, default=[0.9, 0.95, 0.99, 0.995],
                         help="List of sparsity levels to test (values between 0 and 1, e.g. 0.95)")
