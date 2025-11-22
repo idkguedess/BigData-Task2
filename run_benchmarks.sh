@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SIZES=(10 50 100 256 512)
+SIZES=(10 50 100 256 512 1024)
 RUNS=10
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$ROOT_DIR/results"
