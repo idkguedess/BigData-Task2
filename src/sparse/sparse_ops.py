@@ -1,4 +1,3 @@
-import numpy as np
 import scipy.sparse as sp
 
 def scipy_sparse_mult(A, B):

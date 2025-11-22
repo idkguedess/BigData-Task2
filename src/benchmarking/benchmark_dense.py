@@ -4,40 +4,43 @@ import pandas as pd
 from algorithms.naive import naive_python_mult
 from algorithms.blocked import blocked_dot
 from algorithms.numpy_dot import numpy_dot_mult
+from algorithms import multiply_matrices, allocate_matrix, initialize_matrix
+from typing import List, Dict
+from utils.measure import measure
 
-def measure(func, *args, repeats=1, timeout=20):
-    times = []
-    for _ in range(repeats):
-        t0 = time.perf_counter()
-        func(*args)
-        t1 = time.perf_counter()
-        if t1 - t0 > timeout:
-            return None
-        times.append(t1 - t0)
-    return sum(times) / repeats
-
-def benchmark_dense(sizes=[64,128,256,512]):
+def run_dense_bench(size: int, repeats: int, algorithms: List[str]) -> List[Dict]:
     results = []
 
-    for n in sizes:
-        A = np.random.rand(n,n)
-        B = np.random.rand(n,n)
+    A = np.random.rand(size, size)
+    B = np.random.rand(size, size)
 
-        row = {"n": n}
+    for alg in algorithms:
+        row = {"n": size, "algorithm": alg, "time": None}
 
-        row["numpy_dot"] = measure(numpy_dot_mult, A, B)
-        row["blocked"]   = measure(blocked_dot, A, B, block=64)
+        if alg == "numpy":
+            t = measure(numpy_dot_mult, A, B, repeats=repeats)
+            row["time"] = t
 
-        if n <= 128:
-            row["naive"] = measure(naive_python_mult, A, B)
+        elif alg == "blocked":
+            t = measure(blocked_dot, A, B, repeats=repeats)
+            row["time"] = t
+
+        elif alg == "naive":
+            a = allocate_matrix(size)
+            b = allocate_matrix(size)
+            c = allocate_matrix(size)
+            initialize_matrix(a, size, seed=42)
+            initialize_matrix(b, size, seed=123)
+
+            def run_naive():
+                multiply_matrices(a, b, c, size)
+
+            t = measure(lambda: run_naive(), repeats=repeats)
+            row["time"] = t
+
         else:
-            row["naive"] = None
+            raise ValueError(f"Unknown algorithm: {alg}")
 
         results.append(row)
 
-    df = pd.DataFrame(results)
-    df.to_csv("dense_results.csv", index=False)
-    print(df)
-
-if __name__ == "__main__":
-    benchmark_dense()
+    return results
